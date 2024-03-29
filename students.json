@@ -1,0 +1,50 @@
+[
+  {
+    "student_id": "01",
+    "name": "Marc",
+    "session": "1",
+    "courses": ["1","3"]
+  },
+  {
+    "student_id": "02",
+    "name": "Amal",
+    "session": "1",
+    "courses": ["3","5"]
+  },
+  {
+    "student_id": "03",
+    "name": "Yahya",
+    "session": "2",
+    "courses": ["2","4","5"]
+  },
+  {
+    "student_id": "04",
+    "name": "Iyad",
+    "session": "1",
+    "courses": ["5","6"]
+  },
+  {
+    "student_id": "05",
+    "name": "Layan",
+    "session": "3",
+    "courses": ["1","3","4"]
+  },
+  {
+    "student_id": "06",
+    "name": "Emma",
+    "session": "1",
+    "courses": ["2","3"]
+  },
+  {
+    "student_id": "07",
+    "name": "Alice",
+    "session": "2",
+    "courses": ["1"]
+  },
+  {
+    "student_id": "08",
+    "name": "Nicolas",
+    "session": "3",
+    "courses": ["3","5"]
+  }
+]

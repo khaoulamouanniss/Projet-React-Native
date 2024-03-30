@@ -1,10 +1,10 @@
 const availableCourses = [
-  { course_id:"1", label: "Introduction à la programmation", value: "1" },
-  { course_id:"1", label: "Introduction aux bases de données", value: "2" },
-  { course_id:"1", label: "Conception Web", value: "3" },
-  { course_id:"1", label: "Programmation Web", value: "4" },
-  { course_id:"1", label: "Algorithmique", value: "5" },
-  { course_id:"1", label: "Programmation Mobile", value: "6" },
+  { course_id:"1", label: "Introduction to programming"},
+  { course_id:"2", label: "Introduction to databases"},
+  { course_id:"3", label: "Web Design"},
+  { course_id:"4", label: "Web Programming"},
+  { course_id:"5", label: "Algorithmic"},
+  { course_id:"6", label: "Mobile Programming"},
 ];
 
 export default availableCourses;

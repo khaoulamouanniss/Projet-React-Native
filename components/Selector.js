@@ -1,22 +1,23 @@
-// composants/Selecteur.js
+//Selector component
+
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker'; //Install using: npm install @react-native-picker/picker
 
-const Selector = ({ selectedValue, onValueChange, items }) => {
-  return (
+const Selector = ({ selectedValue, onValueChange, items }) => (
     <View style={styles.container}>
-      <Picker
-        selectedValue={selectedValue}
-        onValueChange={onValueChange}
-        style={styles.picker}>
-        {items.map((item, index) => (
-          <Picker.Item key={index} label={item.label} value={item.value} />
-        ))}
-      </Picker>
+        <Picker
+            selectedValue={selectedValue}
+            onValueChange={(item) => onValueChange(item)}
+            style={styles.picker}
+        >
+            <Picker.Item label="Sélectionnez un cours" value="" />
+            {items.map((item) => (
+                <Picker.Item key={item.value} label={item.label} value={item.value} />
+            ))}
+        </Picker>
     </View>
-  );
-};
+);
 
 const styles = StyleSheet.create({
   container: {

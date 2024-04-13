@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Modal, ScrollView, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, Modal, ScrollView, StyleSheet, TouchableOpacity, KeyboardAvoidingView, Platform, BackHandler, Keyboard  } from 'react-native';
 import { I18n } from 'i18n-js';
 import * as Localization from 'expo-localization';
 import translation from './js/translation';
@@ -13,14 +13,16 @@ import sessions from './js/sessions';
 export default function App() {
     const [students, setStudents] = useState([]);
     const [studentId, setStudentId] = useState('');
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [selectedSession, setSelectedSession] = useState('');
-    const [selectedCourse, setSelectedCourse] = useState('');
+    const [selectionState, setSelectionState] = useState({
+        selectedStudent: null,
+        selectedCourse: '',
+        filteredCourses: []
+    });
+
     const [modalVisible, setModalVisible] = useState(false);
     const [error, setError] = useState({ error1: '', error2: '', error3: '' });
     const [language, setLanguage] = useState(Localization.getLocales()[0].languageCode);
     const [showLanguageOptions, setShowLanguageOptions] = useState(false);
-    //const languageOptions = [{ label: 'English', value: 'en' }];
     const translate = new I18n(translation);
     translate.locale = language;
 
@@ -34,73 +36,96 @@ export default function App() {
             });
     }, []);
 
+    useEffect(() => {
+        if (selectionState.selectedStudent) {
+            const session = sessions.find(session => session.session_id === selectionState.selectedStudent.session);
+            const availableCoursesForSession = session ? session.courses.map(courseId => availableCourses.find(course => course.course_id === courseId)).filter(Boolean) : [];
+            setSelectionState(prev => ({ ...prev, filteredCourses: availableCoursesForSession }));
+        }
+    }, [selectionState.selectedStudent]);
+
+    const updateFilteredCourses = (sessionId) => {
+        const session = sessions.find(session => session.session_id === sessionId);
+        const courses = session ? session.courses.map(courseId => availableCourses.find(course => course.course_id === courseId)).filter(Boolean) : [];
+        setSelectionState(prev => ({ ...prev, filteredCourses: courses }));
+    };
+    const handleSelectStudent = (id) => {
+        Keyboard.dismiss();
+        const student = checkStudentExists(id);
+        if (student) {
+            setSelectionState({
+                selectedStudent: student,
+                selectedCourse: '',
+                filteredCourses: []
+            });
+            updateFilteredCourses(student.session);
+            setError({ error2: translate.t("studentSelected") });
+        } else {
+            setSelectionState({ selectedStudent: null, selectedCourse: '', filteredCourses: [] });
+            setError({ error2: '' });
+        }
+    };
+      
+    
     const checkStudentExists = (id) => {
-        const student = students.find(student => student.student_id === id);
+        const student = students.find(s => s.student_id === id);
         if (!student) {
-            setError({ error1: translate.t("No student ID!") });
+            setError({ error1: translate.t("noStudentId") });
             return null;
         } else {
-            setError({ error1: `${translate.t("Student")}: ${student.name}`, error2: translate.t("Please confirm your selection") });
+            setError({ error1: `${translate.t("student")}: ${student.name}`, error2: translate.t("confirmSelection") });
             return student;
         }
     };
 
-    const handleSelectStudent = (id) => {
-        const student = checkStudentExists(id);
-        if (!student) {
-            setSelectedStudent(null);
-            setError({ error2: '' });
-            
-        } else {
-          setSelectedStudent(student);
-          setSelectedSession(renderSessionLabelById(student.session));
-          setError({ error2:translate.t("Student selected")});
-        }
-    };
+    
 
     const handleRegisterCourse = () => {
-      if (!selectedCourse) {
-          setError({ error3: translate.t("No courses selected") });
-          return;
-      }
-      // Utilisez la fonction pour obtenir l'ID du cours à partir du label
-      const courseId = selectedCourse;
-      if (!courseId || selectedStudent.courses.includes(courseId)) {
-          setError({ error3: translate.t("The student is already enrolled in this course") });
-          return;
-      }
-      if (selectedStudent.courses.length >= 5) {
-          setError({ error3: translate.t("A student cannot be enrolled in more than 5 courses") });
-          return;
-      }
-      const updatedCourses = [...selectedStudent.courses, courseId];
-      const updatedStudent = {
-          ...selectedStudent,
-          courses: updatedCourses,
-      };
-      setStudents(students.map(student => student.student_id === selectedStudent.student_id ? updatedStudent : student));
-      setSelectedStudent(updatedStudent);
-      setSelectedCourse('');
-      setError({ error3: '' });
-  };
-
+        const { selectedCourse, selectedStudent } = selectionState;
+        if (!selectedCourse) {
+            setError({ error3: translate.t("noCoursesSelected") });
+            return;
+        }
+        if (selectedStudent.courses.includes(selectedCourse)) {
+            setError({ error3: translate.t("studentEnrolledInCourse") });
+            return;
+        }
+        if (selectedStudent.courses.length >= 5) {
+            setError({ error3: translate.t("studentEnrollmentLimit") });
+            return;
+        }
+        const updatedStudent = {
+            ...selectedStudent,
+            courses: [...selectedStudent.courses, selectedCourse]
+        };
+        setSelectionState(prev => ({ ...prev, selectedStudent: updatedStudent }));
+        setStudents(students.map(s => s.student_id === updatedStudent.student_id ? updatedStudent : s));
+        setError({ error3: translate.t("courseAdded") });
+    };
+    const handleSelectCourseChange = (newCourseId) => {
+        setError({ error3: '' });
+        setSelectionState(prevState => ({
+            ...prevState,
+            selectedCourse: newCourseId
+        }));
+    };
     const changeLanguage = (selectedLanguage) => {
         setLanguage(selectedLanguage);
         setShowLanguageOptions(false);
         setError({error1:'', error2:'', error3:''});
     };
 
-    // Gestion des sélections et enregistrement...
+    const renderSessionLabelById = (sessionId) => {
+        const session = sessions.find(session => session.session_id === sessionId);
+        return session ? translate.t(`sessions.${sessionId}`) : '';
+    };
 
     const renderCourseLabelById = (courseId) => {
       const course = availableCourses.find(course => course.course_id === courseId);
-      return course ? course.label : '';
+      return course ? translate.t(`courses.${courseId}`) : '';
   };
 
-  const renderSessionLabelById = (sessionId) => {
-      const session = sessions.find(session => session.session_id === sessionId);
-      return session ? session.label : '';
-  };
+  
 
     return (
       <KeyboardAvoidingView
@@ -110,74 +135,84 @@ export default function App() {
         >
           <ScrollView style={{ flex: 1 }} contentContainerStyle={{ flexGrow: 1 }}>
         <View style={styles.container}>
-            <Title text={translate.t("REGISTRATION FOR COURSES")} />
+        <Button 
+        title="X" 
+        onPress={() => BackHandler.exitApp()} 
+        style={styles.quitButton} 
+        textStyle={styles.quitButtonText}
+      />
+
+
+            <Title text={translate.t("registrationForCourses")} style={styles.titleBackground}/>
             
+
             <TouchableOpacity onPress={() => setShowLanguageOptions(!showLanguageOptions)} style={styles.languageSelector}>
                 <Text>{language.toUpperCase()}</Text>
             </TouchableOpacity>
             {showLanguageOptions && (
                 <View style={styles.languageOptionsContainer}>
-                    {['fr', 'en', 'ar'].map((lang, index) => (
-                        <TouchableOpacity 
-                        key={index}
-                        style={styles.languageOption}
-                        onPress={() => changeLanguage(lang)} >
-                            <Text style={styles.languageOptionText}>{lang.toUpperCase()}</Text>
-                        </TouchableOpacity>
-                    ))}
+                    {['fr', 'en', 'ar'].filter(lang => lang !== language).map((lang, index) => (
+  <TouchableOpacity 
+    key={index}
+    style={styles.languageOption}
+    onPress={() => changeLanguage(lang)} >
+    <Text style={styles.languageOptionText}>{lang.toUpperCase()}</Text>
+  </TouchableOpacity>
+))}
+
                 </View>
             )}
             <View style={styles.section}>
-                <CustomTextInput placeholder={translate.t("Student ID")} value={studentId} onChangeText={(text) => {setStudentId(text); checkStudentExists(text)}} />
+                <CustomTextInput placeholder={translate.t("studentId")} value={studentId} onChangeText={(text) => {setStudentId(text); checkStudentExists(text)}} />
                 <Text style={styles.errorMessage}>{error.error1}</Text>
-                <Button title={translate.t("Select a student")} onPress={() => handleSelectStudent(studentId)} />
+                <Button title={translate.t("selectAStudent")} onPress={() => handleSelectStudent(studentId) } />
                 <Text style={styles.confirmation}>{error.error2}</Text>
             </View>
-            {selectedStudent && (
+    
+
+            {selectionState.selectedStudent && (
               <>
                 
                     <View style={styles.section}>
-                    <Selector
-  selectedValue={selectedSession}
-  onValueChange={setSelectedSession}
-  items={sessions.map(session => ({
-    value: session.session_id, // Utilisez session_id comme valeur
-    label: translate.t(`sessions.${session.label}`), // Traduisez le label pour l'affichage
-  }))}
-/>
+                        <Text>{selectionState.selectedStudent.student_id} {selectionState.selectedStudent.name}</Text>
+                        <View style={styles.sessionDisplay}>
+  <Text style={styles.sessionText}>
+    {translate.t(`sessions.${(selectionState.selectedStudent.session)}`)}
+  </Text>
+</View>
 <Selector
-  selectedValue={selectedCourse}
-  onValueChange={setSelectedCourse}
-  items={availableCourses.map(course => ({
-    value: course.course_id, // Utilisez course_id comme valeur
-    label: translate.t(`courses.${course.label}`), // Traduisez le label pour l'affichage
+  selectedValue={selectionState.selectedCourse}
+  onValueChange={handleSelectCourseChange}
+  items={selectionState.filteredCourses.map(course => ({
+    value: course.course_id, 
+    label: translate.t(`courses.${course.course_id}`),
   }))}
 />
 
                         <Text style={styles.errorMessage}>{error.error3}</Text>
                     </View>
                     <View style={styles.section}>
-                        <Button title={translate.t("Save")} onPress={handleRegisterCourse} />
-                        <Button title={translate.t("Display")} onPress={() => setModalVisible(true)} />
+                        <Button title={translate.t("save")} onPress={handleRegisterCourse} />
+                        <Button title={translate.t("display")} onPress={() => setModalVisible(true)} />
                     </View>
 
                     <Modal visible={modalVisible} transparent animationType="slide" onRequestClose={() => setModalVisible(false)}>
                         <View style={styles.modalContent}>
-                        <Text style={styles.modalText}>{translate.t("Student informations:")}</Text>
-                        {selectedStudent && (
+                        <Text style={styles.modalText}>{translate.t("studentInfos")}</Text>
+                        {selectionState.selectedStudent && (
                         <>
-                        <Text style={styles.modalText}>{translate.t("ID")} {selectedStudent.student_id}</Text>
-                        <Text style={styles.modalText}>{translate.t("Name")} {selectedStudent.name}</Text>
-                            <Text style={styles.modalText}>{`${translate.t("Session")}: ${translate.t(`sessions.${renderSessionLabelById(selectedStudent.session)}`)}`}</Text>
-                            <Text style={styles.modalText}>{translate.t("Enrolled courses")}</Text>
-                            {selectedStudent.courses.map((courseId, index) => (
+                        <Text style={styles.modalText}>{translate.t("id")} {selectionState.selectedStudent.student_id}</Text>
+                        <Text style={styles.modalText}>{translate.t("name")} {selectionState.selectedStudent.name}</Text>
+                            <Text style={styles.modalText}>{`${translate.t("session")}: ${translate.t(`sessions.${selectionState.selectedStudent.session}`)}`}</Text>
+                            <Text style={styles.modalText}>{translate.t("enrolledCourses")}</Text>
+                            {selectionState.selectedStudent.courses.map((courseId, index) => (
                                 <Text key={index} style={styles.modalText}>
-                                    {translate.t(`courses.${renderCourseLabelById(courseId)}`)}
+                                    {translate.t(`courses.${courseId}`)}
                                 </Text>
                             ))}
                         </>
                     )}
-                            <Button title={translate.t('Close')} onPress={() => setModalVisible(false)} />
+                            <Button title={translate.t('close')} onPress={() => setModalVisible(false)} />
                         </View>
                     </Modal>
                 </>
@@ -207,13 +242,13 @@ const styles = StyleSheet.create({
     },
     languageOptionsContainer: {
         position: 'absolute',
-        top: 70,
+        top: 110,
         right: 45,
         flexDirection: 'row',
-        backgroundColor: 'white',
+        backgroundColor: 'transparent',
         //justifyContent:'space-around',
         //borderRadius: 6,
-        padding: 5, // Augmentez le padding pour plus d'espace autour des options
+        padding: 5, 
         
     },
     languageOption: {
@@ -254,7 +289,39 @@ const styles = StyleSheet.create({
     },
     languageSelector: {
         position: 'absolute',
-        top: 80,
+        top: 120,
         right: 20,
     },
+    sessionDisplay: {
+        marginBottom: 15,
+        borderRadius: 5,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        height: 50,
+        justifyContent: 'center',
+        padding: 10,
+        backgroundColor: 'white',  // Assurez-vous que c'est le style que vous voulez
+      },
+      sessionText: {
+        fontSize: 16,
+      },
+      quitButton: {
+        position: 'absolute',  // Position absolue pour le placer spécifiquement
+        top: 25,               // Ajustez selon les besoins pour la marge du haut
+        right: 20,              // Ajustez selon les besoins pour la marge gauche
+        padding: 5,            // Petit padding pour faciliter la touche
+        zIndex:1000,
+      },
+      quitButtonText: {
+         // Taille du texte
+        fontWeight: 'bold'     // Gras pour le caractère 'X'
+      },
+      titleBackground: {
+        marginTop: 50,  // Ajoutez plus de marge en haut pour éviter la superposition
+        backgroundColor: '#eaeaea',  // Un arrière-plan gris clair, choisissez la couleur que vous préférez
+        width: '100%',  // Assurez que le titre prend toute la largeur
+        textAlign: 'center',
+        padding: 10,  // Padding pour un meilleur look
+        borderRadius: 10  // Bords arrondis pour l'esthétique
+      }
 });

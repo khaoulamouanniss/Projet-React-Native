@@ -1,11 +1,12 @@
-// composants/Bouton.js
+//Button component
+
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-const Button = ({ title, onPress }) => (
-  <TouchableOpacity onPress={onPress} style={styles.button}>
-    <Text style={styles.buttonText}>{title}</Text>
-  </TouchableOpacity>
+const Button = ({ title, onPress,style, textStyle }) => (
+    <TouchableOpacity onPress={onPress} style={[styles.button, style]}>
+        <Text style={[styles.buttonText, textStyle]}>{title}</Text>
+    </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({

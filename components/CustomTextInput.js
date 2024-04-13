@@ -1,12 +1,13 @@
-// composants/EntreeTexte.js
+//CustomTextInput component
+
 import React from 'react';
 import { TextInput, StyleSheet } from 'react-native';
 
 const CustomTextInput = (props) => (
-  <TextInput
-    style={styles.input}
-    {...props}  // Spread all other props to the TextInput
-  />
+    <TextInput
+        style={styles.input}
+        {...props}  
+    />
 );
 
 const styles = StyleSheet.create({

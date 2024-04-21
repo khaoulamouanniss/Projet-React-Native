@@ -33,8 +33,10 @@ export default  PuzzleGame = ({titleLabel, bestLabel, worstLabel, currentLabel, 
     const handleSizeChange = (size, type) => {
         if (type === 'line') {
             setParams(prev => ({ ...prev, maxLine: parseInt(size) }));
+            console.log("maxLine",params.maxLine);
         } else if (type === 'column') {
             setParams(prev => ({ ...prev, maxColumn: parseInt(size) }));
+            console.log("maxColumn",params.maxColumn);
         }
     };
 
@@ -124,7 +126,7 @@ export default  PuzzleGame = ({titleLabel, bestLabel, worstLabel, currentLabel, 
                 </ImageBackground>
 
                 <ToolBar 
-                    onNewPuzzle={newPuzzle} 
+                    onNewPuzzle={() => newPuzzle(params, setPuzzle2D, setSelectionMoves, setIsSolved)} 
                     newLabel={newLabel} 
                 />
             </View>

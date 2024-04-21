@@ -1,4 +1,4 @@
-//CustomTextInput component
+//CustomTextInput component (id)
 
 import React from 'react';
 import { TextInput, StyleSheet } from 'react-native';
@@ -6,7 +6,7 @@ import { TextInput, StyleSheet } from 'react-native';
 const CustomTextInput = (props) => (
     <TextInput
         style={styles.input}
-        {...props}  
+        {...props}  //same properties of TextInput
     />
 );
 

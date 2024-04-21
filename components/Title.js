@@ -1,54 +1,46 @@
 // Title component
 
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient'; // Install using: npx expo install expo-linear-gradient
+import Icon from 'react-native-vector-icons/FontAwesome';//Install npm install react-native-vector-icons
 
-const Title = ({ text, style}) => (
-    <LinearGradient
-        colors={['grey', 'darkred']} // Gradient from grey to dark red for the title's background
-        start={{ x: 0, y: 0 }} //Top left
-        end={{ x: 0, y: 1 }} //The gradient moves vertically, for horizontal use end={{ x: 1, y: 0 }}
-        style={[styles.title, style]}
-    >
-        <View style={styles.container}>
-            <Image 
-                source={{ uri: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/CollegeLionelGroulx.jpg/500px-CollegeLionelGroulx.jpg" }} 
-                style={styles.logo} 
-            />
+const Title = ({ text, style,iconName, language}) => {
+    const isArabic = language === 'ar';
+    return (
+        <View style={[styles.container, isArabic ? { flexDirection: 'row-reverse' } : { flexDirection: 'row' }, style]}>
+            {/*if the language is arabic we display with raw-reverse so as to the pic will be on the right of the text */}
+            {iconName && (
+                <Icon 
+                    name={iconName} 
+                    size={25} 
+                    color="#fbf0d4" 
+                    style={styles.icon} 
+                />
+            )}
             <Text style={styles.titleText}>{text}</Text>
         </View>
-    </LinearGradient>
-);
+    );
+}
 
 const styles = StyleSheet.create({
-  linearGradient: {
-    padding: 20, 
-    borderRadius: 5,
-  },
+  
   container: {
-    flexDirection: 'row', // Align horizontally
-    alignItems: 'center', // Center vertically
-  },
-  logo: {
-    width: 50, 
-    height: 50, 
-    marginRight: 10, 
-    borderRadius:10,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-    color: 'black',
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    justifyContent: 'center',
     padding: 10,
+    width: '100%',
+    marginBottom: 10,
+  },
+  icon: {
+    marginRight: 10, 
+    marginLeft: 10,
   },
   titleText: {
-    fontSize: 24,
+    fontSize: 21,
     fontWeight: 'bold',
-    textAlign: 'center',
-    color: 'white',
+    color: '#fbf0d4',
   },
 });
 

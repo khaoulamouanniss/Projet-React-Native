@@ -97,6 +97,7 @@ export default  PuzzleGame = ({titleLabel, bestLabel, worstLabel, currentLabel, 
                             puzzle2D={puzzle2D} 
                             usrOnPress_cb={(l, c) => move_cb(l, c, puzzle2D, params, setPuzzle2D, selectionMoves, setSelectionMoves, setIsSolved)} 
                             dim ={params.maxLine * params.maxColumn} 
+                            isSolved={isSolved}
                         />
                     </View>
 

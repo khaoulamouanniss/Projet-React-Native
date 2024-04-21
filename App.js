@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Modal, ScrollView, StyleSheet, KeyboardAvoidingView, Platform, BackHandler  } from 'react-native';
+import { View, Text, Image, Modal, ScrollView, StyleSheet, KeyboardAvoidingView, Platform, BackHandler, I18nManager  } from 'react-native'; //The I18nManager module allows to determine if the application is currently set to a right-to-left (RTL) language
 import { I18n } from 'i18n-js'; //npx expo install i18n-js
 import * as Localization from 'expo-localization'; //npx expo install expo-localization 
 import translation from './js/translation';
@@ -55,6 +55,7 @@ export default function App() {
     const [showLanguageOptions, setShowLanguageOptions] = useState(false);
     const [showPuzzleGame, setShowPuzzleGame] = useState(false);
     const [appIsReady, setAppIsReady] = useState(false); //for the font
+    const [isArabic, setIsArabic] = useState(language === 'ar');// This tells if the language is RTL
 
     const [fontsLoaded] = useFonts({
         Handlee: require('./fonts/Handlee-Regular.ttf'),  // Assurez-vous que le chemin est correct
@@ -100,7 +101,9 @@ export default function App() {
             const availableCoursesForSession = session ? session.courses.map(courseId => availableCourses.find(course => course.course_id === courseId)) : []; //.filter(Boolean)
             setSelectionState(prev => ({ ...prev, filteredCourses: availableCoursesForSession }));
         }
+       
     }, [selectionState.selectedStudent]);
+    
     
     // Conditionally rendering content based on the app readiness
     if (!appIsReady) {
@@ -116,10 +119,10 @@ export default function App() {
     const checkStudentExists = (id) => {
         const student = students.find(s => s.student_id === id);
         if (!student) {
-            setError({ error1: translate.t("noStudentId") });
+            setError(prevErrors => ({...prevErrors, error1: translate.t("noStudentId")}));
             return null;
         } else {
-            setError({ error1: `${translate.t("student")}: ${student.name}`, error2: translate.t("confirmSelection") });
+            setError(prevErrors => ({...prevErrors, error1: `${translate.t("student")}: ${student.name}`, error2: translate.t("confirmSelection")}));
             return student;
         }
       };
@@ -137,10 +140,10 @@ export default function App() {
                 filteredCourses: []
             });
             //updateFilteredCourses(student.session);
-            setError({ error2: translate.t("studentSelected") });
+            setError(prevErrors => ({...prevErrors,error2: translate.t("studentSelected")}));
         } else {
             setSelectionState({ selectedStudent: null, selectedCourse: '', filteredCourses: [] });
-            setError({ error2: '' });
+            setError(prevErrors => ({...prevErrors, error2: '' }));
         }
       };
 
@@ -150,15 +153,15 @@ export default function App() {
     const handleRegisterCourse = () => {
         const { selectedCourse, selectedStudent } = selectionState;
         if (!selectedCourse) {
-            setError({ error3: translate.t("noCoursesSelected") });
+            setError(prevErrors => ({...prevErrors,error3: translate.t("noCoursesSelected")}));
             return;
         }
         if (selectedStudent.courses.includes(selectedCourse)) {
-            setError({ error3: translate.t("studentEnrolledInCourse") });
+            setError(prevErrors => ({...prevErrors,error3: translate.t("studentEnrolledInCourse")}));
             return;
         }
         if (selectedStudent.courses.length >= 5) {
-            setError({ error3: translate.t("studentEnrollmentLimit") });
+            setError(prevErrors => ({...prevErrors, error3: translate.t("studentEnrollmentLimit")}));
             return;
         }
         const updatedStudent = {
@@ -167,7 +170,7 @@ export default function App() {
         };
         setSelectionState(prev => ({ ...prev, selectedStudent: updatedStudent }));
         setStudents(students.map(s => s.student_id === updatedStudent.student_id ? updatedStudent : s));
-        setError({ error3: translate.t("courseAdded") });
+        setError(prevErrors => ({...prevErrors, error3: translate.t("courseAdded")}));
     };
 
     
@@ -176,7 +179,7 @@ export default function App() {
      * @param {*} newCourseId the new course selected id
      */
     const handleSelectCourseChange = (newCourseId) => {
-        setError({ error3: '' });
+        setError(prevErrors => ({...prevErrors, error3: ''}));
         setSelectionState(prevState => ({
             ...prevState,
             selectedCourse: newCourseId
@@ -191,6 +194,7 @@ export default function App() {
         setLanguage(selectedLanguage);
         setShowLanguageOptions(false);
         setError({error1:'', error2:'', error3:''});
+        setIsArabic(language === 'ar');
     };
    
     // Main render function of the App
@@ -199,7 +203,7 @@ export default function App() {
         <KeyboardAvoidingView 
             style={{ flex: 1 }}
             behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
         >
         {/*This component is used to automatically adjust the keyboard so that it does not block the input fields on the screen when the user needs to type something. 
         (for iOS): Adds padding to the bottom of the view when the keyboard appears
@@ -252,13 +256,13 @@ export default function App() {
                                     value={studentId} 
                                     onChangeText={(text) => {setStudentId(text); checkStudentExists(text)}} 
                                 />
-                                <Text style={styles.errorMessage}>{error.error1}</Text>
+                                <Text style={[styles.errorMessage, {textAlign:language === 'ar' ? 'right' : 'left'}]}>{error.error1}</Text>
                                 
                                 <Button 
                                     title={translate.t("selectAStudent")} 
                                     onPress={() => handleSelectStudent(studentId) } 
                                 />
-                                <Text style={styles.confirmation}>{error.error2}</Text>
+                                <Text style={[styles.confirmation, {textAlign:language === 'ar' ? 'right' : 'left'}]}>{error.error2}</Text>
                             </View>
 
                             {selectionState.selectedStudent && (
@@ -271,16 +275,16 @@ export default function App() {
                                         :`${selectionState.selectedStudent.student_id}, ${selectionState.selectedStudent.name}`}
                                         </Text>
 
-                                        <Text style={styles.studentInfo}>
+                                        <Text style={[styles.studentInfo, {textAlign:language === 'ar' ? 'right' : 'left'}]}>
                                             {translate.t("inSession")} :
                                         </Text>
                                         <View style={styles.sessionDisplay}>
-                                            <Text style={styles.sessionText}>
+                                            <Text style={[styles.sessionText, {textAlign:language === 'ar' ? 'right' : 'left'}]}>
                                                 {translate.t(`sessions.${(selectionState.selectedStudent.session)}`)}
                                             </Text>
                                         </View>
 
-                                        <Text style={styles.studentInfo}>
+                                        <Text style={[styles.studentInfo, {textAlign:language === 'ar' ? 'right' : 'left'}]}>
                                         {translate.t("registerCourse")} :
                                         </Text>
                                         <Selector
@@ -291,6 +295,7 @@ export default function App() {
                                                 label: translate.t(`courses.${course.course_id}`),
                                             }))}
                                             item0={translate.t("selectCourse")}
+                                            language={language}
                                         />
 
                                         <Text style={styles.errorMessage}>{error.error3}</Text>

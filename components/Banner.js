@@ -15,10 +15,11 @@ const Banner = ({ isVisible, message }) => {
 
 const styles = StyleSheet.create({
   banner: {
-    marginTop:10,
+    //marginTop:10,
+    paddingTop:25,
     zIndex: 1,
     backgroundColor: 'transparent',
-    marginBottom:-10,
+    marginBottom:-30,
   },
   bannerText: {
     color: '#012f47',

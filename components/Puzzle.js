@@ -7,19 +7,20 @@ const Line = ({ children }) => {
     return <View style={styles.line}>{children}</View>;
 }
 
-const Box = ({ value, usrOnPress_cb,size, fontSize }) => {
+const Box = ({ value, usrOnPress_cb,size, fontSize, isSolved }) => {
     const isEmpty = value === "" || value === null || value === 0;
     return (
         <TouchableOpacity 
             style={[styles.box,{ width: size, height: size }, !isEmpty ? styles.nonEmptyBox : styles.emptyBox]} 
             onPress={usrOnPress_cb}
+            disabled={isSolved}
         >
             <Text style={[styles.value, { fontSize: fontSize }]}>{value}</Text>
         </TouchableOpacity>
     );
 }
 
-const Puzzle = ({ puzzle2D, usrOnPress_cb, dim }) => {
+const Puzzle = ({ puzzle2D, usrOnPress_cb, dim, isSolved }) => {
 
     const baseSize = 50; // for 3x3 puzzles
     const scaleFactor = Math.sqrt(dim) / 3.5; // scaling down as the number of boxes increases
@@ -37,6 +38,7 @@ const Puzzle = ({ puzzle2D, usrOnPress_cb, dim }) => {
                             usrOnPress_cb={() => usrOnPress_cb(l, c)}
                             size={boxSize}
                             fontSize={fontSize}
+                            isSolved={isSolved}
                         />
                     ))}
                 </Line>
@@ -50,7 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom:-50,
+    marginBottom:-20,
   },
   line: {
     flexDirection: 'row',

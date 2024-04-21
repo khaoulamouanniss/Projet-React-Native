@@ -110,13 +110,14 @@ export const move_cb = (l, c, puzzle2D, params, setPuzzle2D,selectionMoves, setS
         const [emptyL, emptyC] = emptyPosition;
         const newPuzzle2D = swapBoxes(l, c, emptyL, emptyC, puzzle2D);
         setPuzzle2D(newPuzzle2D);
-        const newMoves = selectionMoves.moves + 1;
+        let newMoves = selectionMoves.moves + 1;
         let newBestMoves = selectionMoves.bestMoves;
         let newWorstMoves = selectionMoves.worstMoves;
 
         if (isWinner(newPuzzle2D, params,setSelectionMoves)) {
             if ((newMoves < newBestMoves) || newBestMoves === 0) newBestMoves = newMoves;
             if (newMoves > newWorstMoves) newWorstMoves = newMoves;
+            newMoves=0;
             setIsSolved(true);
         }
 

@@ -1,7 +1,7 @@
 //ButtonHeader component
 
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome'; //To install : npm install react-native-vector-icons
 //use icons from https://fontawesome.com/icons
 
@@ -24,7 +24,12 @@ const ButtonHeader = ({ iconName, label, onPress, currentLanguage,  showOptions,
             />
             {label && (
                 <View style={styles.labelContainer}>
-                    <Text style={styles.labelText}>{currentLanguage? languages[label] :label}</Text>
+                    <Text style={[
+                            styles.labelText, 
+                            { fontSize: Platform.OS === 'ios' ? 5 : 6 } // Conditional font size based on platform
+                        ]}>
+                            {currentLanguage? languages[label] :label}
+                        </Text>
                 </View>
             )}
             </TouchableOpacity>
@@ -52,6 +57,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     margin:5,
+    marginTop: Platform.OS === 'ios' ? 10 : 0,
   },
   button: {
     flexDirection: 'column',
@@ -75,8 +81,7 @@ const styles = StyleSheet.create({
   },
   labelText: {
     color: '#012f47',
-    textAlign: 'center',
-    fontSize: 6, 
+    textAlign: 'center', 
   },
   triangle: {
     backgroundColor: 'transparent', 

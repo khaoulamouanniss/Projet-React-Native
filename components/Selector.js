@@ -5,7 +5,7 @@ import { View, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker'; //Install using: npm install @react-native-picker/picker
 import RNPickerSelect from 'react-native-picker-select'; //Install npm install react-native-picker-select
 
-const Selector = ({ selectedValue, onValueChange, items, item0, style, pickerStyle }) => (
+const Selector = ({ selectedValue, onValueChange, items, item0, style, language }) => (
     <View style={[styles.container, style]}>
        {/* <Picker
             selectedValue={selectedValue}
@@ -22,7 +22,8 @@ const Selector = ({ selectedValue, onValueChange, items, item0, style, pickerSty
             items={items.map(item => ({ key:item.value,label: item.label, value: item.value }))}
             value={selectedValue}
             placeholder={{ label: item0, value: null }}
-            style={{...pickerStyle, inputIOS: styles.picker, inputAndroid: styles.picker}}        />
+            style={{inputIOS:{...styles.picker, textAlign:language === 'ar' ? 'right' : 'left', padding:10}, inputAndroid: styles.picker}} 
+             />
     </View>
 );
 

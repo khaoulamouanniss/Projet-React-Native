@@ -15,13 +15,13 @@ const Statistics = ({ bestLabel, worstLabel, currentLabel, best, worst, current,
                 ) : (
                     <>
                         <Text style={styles.label}>{bestLabel}</Text>
-                        <Text style={styles.value}>{best === Infinity ? "N/A" : best}</Text>
+                        <Text style={styles.value}>{best}</Text>
                     </>
                 )}
             </View>
             <View style={styles.statistic}>
                 <Text style={styles.label}>{worstLabel}</Text>
-                <Text style={styles.value}>{worst === 0 ? "N/A" : worst}</Text>
+                <Text style={styles.value}>{worst}</Text>
             </View>
             <View style={[styles.statistic, styles.statisticRight]}>
                 {language === 'ar' ? ( //same, we switch and the middle one stays at its order

@@ -22,8 +22,7 @@ const Selector = ({ selectedValue, onValueChange, items, item0, style, pickerSty
             items={items.map(item => ({ key:item.value,label: item.label, value: item.value }))}
             value={selectedValue}
             placeholder={{ label: item0, value: null }}
-            style={[styles.picker, pickerStyle]}
-        />
+            style={{...pickerStyle, inputIOS: styles.picker, inputAndroid: styles.picker}}        />
     </View>
 );
 
@@ -38,6 +37,7 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     width: '100%',
+    backgroundColor: 'white',
   },
 });
 

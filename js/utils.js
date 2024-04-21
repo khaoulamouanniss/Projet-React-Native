@@ -76,7 +76,7 @@ export function adjacentIsEmpty(l, c, ct2D, params) {
  * @param {*} ct2D 2D table (the puzzle)
  * @returns boolean
  */
-export function isWinner(ct2D, params) {
+export function isWinner(ct2D, params, setSelectionMoves) {
 
     let counter = 1;
     for (let i = 0; i < params.maxLine; i++) {
@@ -89,6 +89,7 @@ export function isWinner(ct2D, params) {
             }
         }
     }
+    setSelectionMoves(prev => ({ ...prev, moves: 0 }));
     return true; 
 }
 
@@ -113,7 +114,7 @@ export const move_cb = (l, c, puzzle2D, params, setPuzzle2D,selectionMoves, setS
         let newBestMoves = selectionMoves.bestMoves;
         let newWorstMoves = selectionMoves.worstMoves;
 
-        if (isWinner(newPuzzle2D, params)) {
+        if (isWinner(newPuzzle2D, params,setSelectionMoves)) {
             if ((newMoves < newBestMoves) || newBestMoves === 0) newBestMoves = newMoves;
             if (newMoves > newWorstMoves) newWorstMoves = newMoves;
             setIsSolved(true);
@@ -134,8 +135,8 @@ export const move_cb = (l, c, puzzle2D, params, setPuzzle2D,selectionMoves, setS
  * @param {*} setSelectionMoves the set to update moves statistics
  * @param {*} setIsSolved the set to update solved
  */
-export const newPuzzle = (params, setPuzzle2D, setSelectionMoves, setIsSolved) => {
+export const newPuzzle = (params, setPuzzle2D,setSelectionMoves, setIsSolved) => {
     setPuzzle2D(generatePuzzle(params.maxLine, params.maxColumn, params.empty));
-    setSelectionMoves({ moves: 0, bestMoves: 0, worstMoves: 0 });
+    setSelectionMoves(prev => ({ ...prev, moves: 0 }));
     setIsSolved(false);
 };

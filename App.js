@@ -140,7 +140,7 @@ export default function App() {
                 filteredCourses: []
             });
             //updateFilteredCourses(student.session);
-            setError(prevErrors => ({...prevErrors,error2: translate.t("studentSelected")}));
+            setError(prevErrors => ({...prevErrors, error1:'', error2: translate.t("studentSelected")}));
         } else {
             setSelectionState({ selectedStudent: null, selectedCourse: '', filteredCourses: [] });
             setError(prevErrors => ({...prevErrors, error2: '' }));
@@ -179,11 +179,12 @@ export default function App() {
      * @param {*} newCourseId the new course selected id
      */
     const handleSelectCourseChange = (newCourseId) => {
-        setError(prevErrors => ({...prevErrors, error3: ''}));
+       
         setSelectionState(prevState => ({
             ...prevState,
             selectedCourse: newCourseId
         }));
+        //setError(prevErrors => ({...prevErrors, error2:'', error3: ''}));
     };
 
     /**
@@ -232,11 +233,13 @@ export default function App() {
                                 onSelectLanguage={changeLanguage}
                             />
                             {/**The button Exit */}
+                            {Platform.OS === 'android' && (
                             <ButtonHeader
                                 iconName="power-off"
                                 label="Exit"
                                 onPress={BackHandler.exitApp}
                             />
+                            )}
                         </View>
 
                         {/**The logo */}
@@ -463,7 +466,7 @@ const styles = StyleSheet.create({
         color: 'black',
     },
     confirmation: {
-        color: '#012f47',
+        color: 'red',
     },
     languageSelector: {
         position: 'absolute',  

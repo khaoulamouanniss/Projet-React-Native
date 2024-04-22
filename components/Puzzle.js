@@ -23,9 +23,9 @@ const Box = ({ value, usrOnPress_cb,size, fontSize, isSolved }) => {
 const Puzzle = ({ puzzle2D, usrOnPress_cb, dim, isSolved }) => {
 
     const baseSize = 50; // for 3x3 puzzles
-    const scaleFactor = Math.sqrt(dim) / 3.5; // scaling down as the number of boxes increases
+    const scaleFactor = Math.sqrt(dim) / 4; // scaling down as the number of boxes increases
     const boxSize = baseSize / scaleFactor;
-    const fontSize = boxSize / 2.5;
+    const fontSize = boxSize / 2;
 
     return (
         <View style={styles.puzzle}>

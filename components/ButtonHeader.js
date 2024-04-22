@@ -5,12 +5,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native
 import Icon from 'react-native-vector-icons/FontAwesome'; //To install : npm install react-native-vector-icons
 //use icons from https://fontawesome.com/icons
 
-const ButtonHeader = ({ iconName, label, onPress, currentLanguage,  showOptions, onSelectLanguage }) => {
-    const languages = {
-      'ar': 'العربية',
-      'fr': 'Français',
-      'en': 'English'
-    };
+const ButtonHeader = ({ iconName, label, onPress, currentLanguage,  showOptions, languages, onSelectLanguage }) => {
     return (
         <View style={styles.container}>
             <TouchableOpacity 
@@ -26,9 +21,9 @@ const ButtonHeader = ({ iconName, label, onPress, currentLanguage,  showOptions,
                 <View style={styles.labelContainer}>
                     <Text style={[
                             styles.labelText, 
-                            { fontSize: Platform.OS === 'ios' ? 5 : 6 } // Conditional font size based on platform
+                            { fontSize: Platform.OS === 'ios' ? 9 : 10, textTransform: currentLanguage ? 'uppercase' : 'none' } // Conditional font size based on platform
                         ]}>
-                            {currentLanguage? languages[label] :label}
+                            {label}
                         </Text>
                 </View>
             )}
@@ -123,7 +118,7 @@ const styles = StyleSheet.create({
   optionText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 8,
+    fontSize: 9,
   },
   });
 

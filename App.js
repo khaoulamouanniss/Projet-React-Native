@@ -1,8 +1,11 @@
 /**
- * 
+ * Travail final Applications Mobile 1
  * Fait par : Khaoula El mouanniss
  * Le 20 avril 2024
- * color palette used : #780001, #d3252f, #fbf0d4, #012f47, #659cbb
+ * Il s’agit de créer une application mobile avec React Native pour deux projets:
+ * L’inscription des élèves aux cours.
+ * Jeu Puzzle
+ * Palette de couleurs utilisée : #780001, #d3252f, #fbf0d4, #012f47, #659cbb
  */
 
 import React, { useState, useEffect } from 'react';
@@ -103,7 +106,6 @@ export default function App() {
         }
        
     }, [selectionState.selectedStudent]);
-    
     
     // Conditionally rendering content based on the app readiness
     if (!appIsReady) {
